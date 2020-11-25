@@ -7,8 +7,6 @@ public class Weapon : MonoBehaviour
     public GameObject bulletPrefab;
     public GameObject shooter;
 
-    public GameObject explosionEffect;
-
     private Transform _firePoint;
 
     private void Awake()
@@ -31,7 +29,7 @@ public class Weapon : MonoBehaviour
     {
         if (bulletPrefab != null && _firePoint != null && shooter != null)
         {
-            GameObject myBullet = Instantiate(explosionEffect, _firePoint.position, Quaternion.identity) as GameObject;
+            GameObject myBullet = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity) as GameObject;
 
             Bullet bulletComponent = myBullet.GetComponent<Bullet>();
 

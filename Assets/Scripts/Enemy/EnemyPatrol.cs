@@ -78,6 +78,7 @@ public class EnemyPatrol : MonoBehaviour
         _animator.SetBool("Idle", _rigidbody2D.velocity == Vector2.zero);
     }
 
+    //Hacer que el enemigo dispare
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (_isAttacking == false && collision.CompareTag("Player"))
@@ -85,6 +86,7 @@ public class EnemyPatrol : MonoBehaviour
             StartCoroutine(AimAndShoot());
         }
     }
+
     private IEnumerator AimAndShoot()
     {
         float speedBackup = speed;
