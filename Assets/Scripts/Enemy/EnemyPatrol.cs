@@ -1,20 +1,30 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
     public float speed = 1f;
-    public float minX;
-    public float maxX;
-    public float waitingTime = 2f;
+    public float wallAware = 0.5F;
+    public LayerMask groundLayer;
+    public float playerAware = 3f;
+    public float aimingTime = 0.5f;
+    public float shootingTime = 1.5f;
 
-    private GameObject _target;
+    private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private Weapon _weapon;
 
+    private Vector2 _movement;
+    private bool _facingRight;
+    private bool _isAttacking;
+
+
+
     void Awake()
     {
+        _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _weapon = GetComponentInChildren<Weapon>();
     }
@@ -22,83 +32,89 @@ public class EnemyPatrol : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        UpdateTarget();
-        StartCoroutine("PatrolToTarget");
+
+        //Direccion del enemigo
+        if (transform.localScale.x < 0f)
+        {
+            _facingRight = false;
+        }else if (transform.localScale.x > 0f)
+        {
+            _facingRight = true;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        Vector2 direction = Vector2.right;
+
+        if (_facingRight == false)
+        {
+            direction = Vector2.left;
+        }
+
+        if(_isAttacking == false)
+        {
+            //Si el enemigo se encuentra a una distancia de media unidad de unity de un muro entonces el enemigo gira.
+            if(Physics2D.Raycast(transform.position, direction, wallAware, groundLayer))
+            {
+                Flip();
+            }
+        }
         
     }
-
-    private void UpdateTarget()
+    private void FixedUpdate()
     {
-        //Puntos de dirección del enemigo
-        // Al inicio, crea un target a la izquierda
-        if (_target == null)
+        float horizontalVelocity = speed;
+        if (_facingRight == false)
         {
-            _target = new GameObject("Target");
-            _target.transform.position = new Vector2(minX, transform.position.y);
-            transform.localScale = new Vector3(-1,1,1);
-            return;
+            horizontalVelocity = horizontalVelocity * -1f;
         }
-        // If we are in the left, change target to the rght
-        if (_target.transform.position.x == minX)
-        {
-            _target.transform.position = new Vector2(maxX, transform.position.y);
-            transform.localScale = new Vector3(1,1,1);
-        }
-
-        // If we are in the right, change target to the left
-        else if(_target.transform.position.x == maxX)
-        {
-            _target.transform.position = new Vector2(minX, transform.position.y);
-            transform.localScale = new Vector3(-1,1,1);
-        }
+        _rigidbody2D.velocity = new Vector2(horizontalVelocity, _rigidbody2D.velocity.y);
     }
 
-    private IEnumerator PatrolToTarget()
+    public void LateUpdate()
     {
-        // Corrutina para mover al enemigo
-        while (Vector2.Distance(_target.transform.position, transform.position) > 0.05f)
+        _animator.SetBool("Idle", _rigidbody2D.velocity == Vector2.zero);
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (_isAttacking == false && collision.CompareTag("Player"))
         {
-            _animator.SetBool("Idle",false);
-
-            Vector2 direction = _target.transform.position - transform.position;
-            float xDirection = direction.x;
-
-            transform.Translate(direction.normalized * speed * Time.deltaTime);
-
-            // IMPORTANTE
-            yield return null;
+            StartCoroutine(AimAndShoot());
         }
+    }
+    private IEnumerator AimAndShoot()
+    {
+        float speedBackup = speed;
+        speed = 0;
+        _isAttacking = true;
 
-        // At this point, I've reached the target, let's set our position the target's one
-        transform.position = new Vector2(_target.transform.position.x, transform.position.y);
+        yield return new WaitForSeconds(aimingTime);
 
-        UpdateTarget();
-
-        _animator.SetBool("Idle", true);
-
-        // Shot
         _animator.SetTrigger("Shoot");
 
+        yield return new WaitForSeconds(shootingTime);
 
-
-        // And let's wait for a moment
-        yield return new WaitForSeconds(waitingTime);
-
-        // Once waited, let's restore the patrol behaviour
-
-        StartCoroutine("PatrolToTarget");
+        _isAttacking = false;
+        speed = speedBackup;
     }
 
-    //void CanShoot()
-    //{
-    //    if (_weapon != null)
-    //    {
-    //        _weapon.Shoot();
-    //    }
-    //}
+    private void Flip()
+    {
+        _facingRight = !_facingRight;
+        float localScaleX = transform.localScale.x;
+        localScaleX = localScaleX * -1f;
+        transform.localScale = new Vector3(localScaleX, transform.localScale.y, transform.localScale.z);
+
+    }
+
+    void CanShoot()
+    {
+        if(_weapon != null)
+        {
+            _weapon.Shoot();
+        }
+    }
 }

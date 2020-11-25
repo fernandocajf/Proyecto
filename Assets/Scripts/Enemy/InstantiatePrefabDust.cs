@@ -8,7 +8,7 @@ public class InstantiatePrefabDust : MonoBehaviour
 	public Transform point;
 	public float livingTime;
 
-    public void Instantiate()
+    public void Dust()
 	{
 		GameObject instantiatedObject = Instantiate(prefab, point.position, Quaternion.identity) as GameObject;
 
