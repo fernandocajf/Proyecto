@@ -8,15 +8,14 @@ public class EnemyPatrol : MonoBehaviour
     public float speed = 1f;
     public float wallAware = 0.5F;
     public LayerMask groundLayer;
-    public float playerAware = 3f;
-    public float aimingTime = 0.5f;
-    public float shootingTime = 1.5f;
+ 
+    public float aimingTime = 0.2f;
+    public float shootingTime = 1f;
 
     private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private Weapon _weapon;
 
-    private Vector2 _movement;
     private bool _facingRight;
     private bool _isAttacking;
 
@@ -66,9 +65,15 @@ public class EnemyPatrol : MonoBehaviour
     private void FixedUpdate()
     {
         float horizontalVelocity = speed;
+
         if (_facingRight == false)
         {
             horizontalVelocity = horizontalVelocity * -1f;
+        }
+
+        if (_isAttacking)
+        {
+            horizontalVelocity = 0f;
         }
         _rigidbody2D.velocity = new Vector2(horizontalVelocity, _rigidbody2D.velocity.y);
     }
@@ -78,7 +83,7 @@ public class EnemyPatrol : MonoBehaviour
         _animator.SetBool("Idle", _rigidbody2D.velocity == Vector2.zero);
     }
 
-    //Hacer que el enemigo dispare
+    //Hacer que el enemigo no se mueva y dispare 
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (_isAttacking == false && collision.CompareTag("Player"))
@@ -91,6 +96,7 @@ public class EnemyPatrol : MonoBehaviour
     {
         float speedBackup = speed;
         speed = 0;
+
         _isAttacking = true;
 
         yield return new WaitForSeconds(aimingTime);
@@ -118,5 +124,16 @@ public class EnemyPatrol : MonoBehaviour
         {
             _weapon.Shoot();
         }
+    }
+
+    private void OnEnable()
+    {
+        _isAttacking = false;
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine("AimAndShoot");
+        _isAttacking = false;
     }
 }

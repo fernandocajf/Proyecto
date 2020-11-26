@@ -13,6 +13,7 @@ public class PlayerScript : MonoBehaviour
     public LayerMask groundLayer;
     public float groundCheckRadius;
 
+    public Transform _startPoint;
 
     private Rigidbody2D _rigidbody;
     private Animator _animator;
@@ -37,7 +38,7 @@ public class PlayerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        gameObject.transform.position = new Vector2(_startPoint.transform.position.x, _startPoint.transform.position.y);
     }
 
     // Update is called once per frame

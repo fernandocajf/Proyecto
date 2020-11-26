@@ -12,10 +12,13 @@ public class Bullet : MonoBehaviour
     public Color initialColor = Color.white;
     public Color finalColor;
 
+    public int damage = 1;
+
     private SpriteRenderer _renderer;
     private Rigidbody2D _rigidbody2D;
 
     private float _startingTime;
+    private bool _returning;
 
     private void Awake()
     {
@@ -49,9 +52,22 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        if (_returning == false && collision.CompareTag("Player"))
         {
+            collision.SendMessageUpwards("AddDamage", damage);
             Destroy(gameObject);
         }
+
+        if (_returning == true && collision.CompareTag("Enemy")) 
+        {
+            collision.SendMessageUpwards("AddDamage");
+            Destroy(gameObject);
+        }
+    }
+
+    private void AddDamage()
+    {
+        _returning = true;
+        direction = direction * -1f;
     }
 }

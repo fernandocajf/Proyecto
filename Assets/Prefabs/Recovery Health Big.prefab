@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4602370498670026434}
   - component: {fileID: 2894915604680985928}
   - component: {fileID: 871964749}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Recovery Health Big
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8a5853f8fe0f324ca20c5f8909f183d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healtRestoration: 1
   lightingParticles: {fileID: 166172}
   burstParticles: {fileID: 6414774508388345245}
 --- !u!1 &166172
@@ -147,7 +148,7 @@ GameObject:
   - component: {fileID: 416846}
   - component: {fileID: 19816674}
   - component: {fileID: 19906718}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Lighting Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4861,7 +4862,7 @@ GameObject:
   - component: {fileID: 2228187173253749031}
   - component: {fileID: 5581758339315723420}
   - component: {fileID: 2489800216075153229}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Burst Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
